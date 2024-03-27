@@ -40,7 +40,7 @@ class GoogleAuthController extends Controller
             Cookie::queue('auth_token', 'your_auth_token_value', 60);
 
             // Redirect the user to the intended destination
-            return redirect()->intended('/');
+            return redirect()->intended('dashboard');
         } catch (\Exception $e) {
             // Handle any exceptions that occur during the authentication process
             dd($e->getMessage());

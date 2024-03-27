@@ -73,5 +73,7 @@ class Kernel extends HttpKernel
      */
     protected $routeMiddleware = [
         'custom.admin.auth' => \App\Http\Middleware\CustomAdminAuthMiddleware::class,
+        'admin.check' => \App\Http\Middleware\CheckAdminVerified::class,
+        
     ];
 }

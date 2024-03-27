@@ -8,6 +8,8 @@ use App\Http\Controllers\AdminRegistrationController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\UserAuthController;
+
 
 // Welcome route
 Route::get('/', function () {
@@ -26,27 +28,50 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
+
+
 // Authentication routes
 require __DIR__.'/auth.php';
 
-// Admin authentication routes
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/login', function () {
-        return view('admin.login');
-    })->name('login');
-    Route::post('/login', [AdminAuthController::class, 'login']);
 
-    // Admin registration routes
-    Route::get('/register', [AdminRegistrationController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [AdminRegistrationController::class, 'register'])->name('register.submit');
+
+
+Route::prefix('admin')->group(function () {
+    // Registration routes
+    Route::get('/register', [AdminAuthController::class, 'showRegistrationForm'])->name('admin.register');
+    Route::post('/register', [AdminAuthController::class, 'register']);
+
+//     // Login routes
+//     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+//     Route::post('/login', [AdminAuthController::class, 'login']);
+
+
 });
 
+Route::prefix('user')->middleware('guest')->group(function () {
+    Route::get('/login', [UserAuthController::class, 'showLoginForm'])->name('user.login');
+    Route::post('/login', [UserAuthController::class, 'login']);
+    Route::get('/register', [UserAuthController::class, 'showRegistrationForm'])->name('user.register');
+    Route::post('/register', [UserAuthController::class, 'register']);
+});
+
+
+
+
+
 // Admin dashboard route
-// Route::middleware(['auth:admin', 'verified'])->group(function () {
-//     Route::get('/admin/dashboard', [AdminControllerCustom::class, 'dashboard'])->name('admin.dashboard');
-//     Route::get('/admin/profile', [AdminControllerCustom::class, 'profile'])->name('admin.profile');
-//     Route::patch('/admin/profile', [AdminControllerCustom::class, 'updateProfile'])->name('admin.profile.update');
-// });
+Route::get('/admin/login', [App\Http\Controllers\AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [App\Http\Controllers\AdminAuthController::class, 'login'])->name('admin.login.submit');
+
+Route::middleware(['auth:admin', 'verified'])->group(function () {
+    Route::get('/admin/dashboard', [App\Http\Controllers\AdminControllerCustom::class, 'dashboard'])->name('admin.dashboard');
+    // Route::get('/admin/profile', [App\Http\Controllers\AdminControllerCustom::class, 'profile'])->name('admin.profile');
+    // Route::patch('/admin/profile', [App\Http\Controllers\AdminControllerCustom::class, 'updateProfile'])->name('admin.profile.update');
+    Route::post('/admin/logout', [App\Http\Controllers\AdminControllerCustom::class, 'logout'])->name('admin.logout');
+});
+
+
 
 // Other routes
 Route::name('')->group(function () {
@@ -66,16 +91,6 @@ Route::get('google-auth', [GoogleAuthController::class, 'redirect'])->name('goog
 Route::get('auth/google/call-back', [GoogleAuthController::class, 'callbackGoogle'])->name('google-callback');
 Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
-
-
-Route::middleware(['custom.admin.auth'])->group(function () {
-    
-});
-
-Route::get('/admin/dashboard', [AdminControllerCustom::class, 'dashboard'])->name('admin.dashboard');
-Route::get('/admin/profile', [AdminControllerCustom::class, 'profile'])->name('admin.profile');
-Route::patch('/admin/profile', [AdminControllerCustom::class, 'updateProfile'])->name('admin.profile.update');
-Route::post('/admin/logout', [AdminControllerCustom::class, 'logout'])->name('admin.logout');
 
 
 
